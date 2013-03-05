@@ -1,5 +1,6 @@
 ## 450K annotation package ##
 source("http://bioconductor.org/biocLite.R")
+biocLite('AnnotationForge')
 biocLite("IlluminaHumanMethylation450k.db")
 
 library(IlluminaHumanMethylation450k.db)
