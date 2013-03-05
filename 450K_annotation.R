@@ -50,3 +50,14 @@ relation<-as.data.frame(IlluminaHumanMethylation450kCPGIRELATION)
 head(relation)
 nrow(relation)
 
+# Aggregate the beta values of the probes for each CpG island.
+cpginame <- as.data.frame(IlluminaHumanMethylation450kCPGINAME)
+colnames(cpginame) <- c('Probe_ID', 'cpginame')
+rownames(cpginame) <- cpginame$Probe_ID
+cpginame$cpginame <- factor(cpginame$cpginame)
+CTRL.cpginame <- merge(CTRL.dat, cpginame, by='row.names')
+sampleNames <- colnames(CTRL.dat)
+CTRL.cpgislands <- simplify2array(by(
+	CTRL.cpginame[,sampleNames],
+	list(CTRL.cpginame$cpginame),
+	colMeans))
