@@ -1,9 +1,8 @@
 # Aggregate the beta values of the probes for each CpG island.
 # Input: 1.) normalized beta-value data sets
 #        2.) metadata
-# Output: 1.) metadata with groups column
-#         2.) beta-value AND M-value data sets with CPGI attached
-#         3.) beta-value AND M-value CPGI-level data (mean)
+# Output: 1.) beta-value AND M-value data sets with CPGI attached
+#         2.) beta-value AND M-value CPGI-level data (mean)
 
 
 library(IlluminaHumanMethylation450k.db)
@@ -55,5 +54,6 @@ cpgi.M <- lapply(cpgi.M, t)
 
 ########### Edit the path!!!!!!!!!!!!!!!!!!!
 save(cpgi.probes.Beta, file = 'Data/CPGI2Probe_betaList.Rdata')
-save(cpgi.probes.M, file = 'Data/CPGI_MList.Rdata')
-
+save(cpgi.probes.M, file = 'Data/CPGI2Probe_MList.Rdata')
+save(cpgi.Beta, file = 'Data/CPGI_betaList.Rdata')
+save(cpgi.M, file = 'Data/CPGI_MList.Rdata')
