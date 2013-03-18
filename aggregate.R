@@ -4,7 +4,7 @@
 # Output: 1.) beta-value AND M-value data sets with CPGI attached
 #         2.) beta-value AND M-value CPGI-level data (mean)
 
-
+setwd('~/UBC Stats/STAT540/Group Project/')
 library(IlluminaHumanMethylation450k.db)
 
 ### Load in (EDIT PATH):

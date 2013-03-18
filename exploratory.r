@@ -10,10 +10,15 @@
 ###### 5.) Identify probes with difference > 0.2 between controls
 
 
+
 setwd('~/UBC Stats/STAT540/Group Project/')
 library(plyr)
 library(ggplot2)
 
+##### Load data (SET PATH!!!)
+load('Data/All_3_metasets.Rdata')
+load('Data/All_3_sets.Rdata')
+dataList <- list(ALL = ALL.dat, APL = APL.dat, CTRL = CTRL.dat)
 ##########################################
 ### Counting and plotting NAs per sample:
 ##########################################
