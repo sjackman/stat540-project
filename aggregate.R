@@ -25,8 +25,10 @@ cpginame$cpginame <- factor(cpginame$cpginame)
 ##### First restrict all data sets to probes in mapping:
 cpgi.probes.Beta <- lapply(dataList, function(x) x[cpginame$Probe_ID,])
 
-##### Create M values:
-cpgi.probes.M <- lapply(cpgi.probes.Beta, logit)
+##### Create M values
+##### Add 0.001 to avoid getting -Inf. Maximum of any array is 0.9981:
+
+cpgi.probes.M <- lapply(cpgi.probes.Beta, function(x) logit(x + 0.001))
 
 #### Tack on to data in both lists: CPGI as a factor
 cpgi.probes.Beta <- lapply(cpgi.probes.Beta, function(x) 
