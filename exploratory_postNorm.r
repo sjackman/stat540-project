@@ -120,4 +120,4 @@ dataList <- lapply(normList, function(x) x[keepers,])
 
 ### Saving normalized and CpG-filtered data sets:
 ALL.dat <- dataList$ALL; APL.dat <- dataList$APL; CTRL.dat <- dataList$CTRL
-save(ALL.dat, APL.dat, CTRL.dat, file = 'Data/All_3_sets_normAndFilt.Rdata.Rdata')
+save(ALL.dat, APL.dat, CTRL.dat, file = 'Data/All_3_sets_normAndFilt.Rdata')
