@@ -141,25 +141,25 @@ rm(data.norm.noNAs, i, tmp)
 ###################################################
 ##### Plot distributions of samples
 ###################################################
-library(lattice)
-library(latticeExtra)
+library(ggplot2)
 
-dat.probeMeans <- unlist(lapply(dataList.norm, function(x) 
-  apply(x, 1, function(y) mean(y, na.rm = T))))
 
-plotDat <- data.frame(Beta = dat.probeMeans, Data = rep(c('ALL', 'APL', 'CTRL'), each = nrow(ALL.norm)))
+### Load non-normalized data 
+load("All_3_sets.Rdata")
+GSE42865<-data.frame(beta=rowMeans(CTRL.dat), Series=as.factor("GSE42865"),norm=as.factor("Pre-Normalization"))
+GSE42118<-data.frame(beta=rowMeans(APL.dat), Series=as.factor("GSE42118"),norm=as.factor("Pre-Normalization"))
+GSE39141<-data.frame(beta=rowMeans(ALL.dat), Series=as.factor("GSE39141"),norm=as.factor("Pre-Normalization"))
 
-colors <- brewer.pal(3, 'Set1')
-my.settings <- list(superpose.line = list(col = colors, lwd = 1.5))
-png('Figures/Density_3_series_beta_norm.png', height = 500, width = 650)
-densityplot(~Beta, data = plotDat, groups = Data, plot.points = F, lwd = 2,
-            par.settings = my.settings, xlab = 'Beta', 
-            auto.key = list(space = 'top', lines = T, points = F, columns = 3),
-            panel = function(...){
-              panel.densityplot(...)
-              panel.abline(v = 0.2, col = 'red')
-              panel.abline(v = 0.7, col = 'red')
-            }, main = 'Density of Normalized Beta-Values for 3 arrays averaged over samples in array')
+## Rename normalized objects
+GSE42865.n<-CTRL.norm
+GSE42118.n<-APL.norm
+GSE39141.n<-ALL.norm
+
+Norm.Not<-rbind(GSE42118,GSE39141,GSE42865,GSE42118.n,GSE39141.n,GSE42865.n)
+
+png('Density_3_series_beta_norm.png', height = 500, width = 600)
+ggplot(Norm.Not, aes(beta, color=Series)) + geom_density()+
+  labs(title = "Comparison of Beta Value Distribution", x="",y="Beta Frequency") +facet_grid(norm ~ .)+
+  theme_bw()
 dev.off()
-
 
