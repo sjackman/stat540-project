@@ -14,7 +14,7 @@ genes.gr <- GRanges(
 
 coordToGene <- function(x) {
 # Convert the coordinates of CpG islands to gene names.
-	cgi <- data.frame(t(simplify2array(strsplit(x, '[:-]'))),
+	cgi <- data.frame(t(simplify2array(strsplit(as.character(x), '[:-]'))),
 		row.names=x,
 		stringsAsFactors=FALSE)
 	colnames(cgi) <- c('chr', 'start', 'end')
@@ -26,5 +26,5 @@ coordToGene <- function(x) {
 		ranges = IRanges(start=cgi$start, end=cgi$end),
 		names = rownames(cgi))
 	overlaps <- findOverlaps(cgi.gr, genes.gr)
-	return(genes[subjectHits(overlaps), 'hgnc_symbol'])
+	return(unique(genes[subjectHits(overlaps), 'hgnc_symbol']))
 }

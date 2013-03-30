@@ -40,8 +40,7 @@ lm.t$q <- p.adjust(lm.t$p, 'BH')
 write.table(lm.t, 'Data/lm.tab')
 
 # Write the gene set to a file.
-lm.geneset <- unique(coordToGene(as.character(
-	subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE))))
+lm.geneset <- coordToGene(subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE))))
 writeLines(lm.geneset, 'Data/lm-geneset.txt')
 
 # Fit a linear mixed-effects model.
@@ -53,9 +52,13 @@ colnames(lme.t) <- c('cgi', 't')
 write.table(lme.t, 'Data/lme.tab')
 
 # Write the gene set to a file.
-lme.geneset <- unique(coordToGene(as.character(
-	subset(lme.t, subset = abs(t) > 10, select = cgi, drop = TRUE))))
+lme.geneset <- coordToGene(
+	subset(lme.t, subset = abs(t) > 10, select = cgi, drop = TRUE))
 writeLines(lme.geneset, 'Data/lme-geneset.txt')
+writeLines(con='Data/lme-down-geneset.txt',
+	coordToGene(subset(lme.t, subset = t < -10, select = cgi, drop = TRUE)))
+writeLines(con='Data/lme-up-geneset.txt',
+	coordToGene(subset(lme.t, subset = t > 10, select = cgi, drop = TRUE)))
 
 # Plot a Venn diagram of the overlap of the fixed and mixed models.
 plot.new()
