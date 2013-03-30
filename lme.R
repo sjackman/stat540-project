@@ -2,11 +2,13 @@
 
 setwd('~/UBC Stats/STAT540/Group Project/')
 load('Data/CPGI2Probe_MList.Rdata')
+source('coord_to_gene.R')
 library(latticeExtra)
 library(lme4)
 library(plyr)
 library(RColorBrewer)
 library(reshape2)
+library(VennDiagram)
 
 # Bind the datasets into one data frame.
 cpgi.probes.M.dat <- with(cpgi.probes.M,
@@ -34,15 +36,43 @@ lm.t <- ddply(tall, .(cgi), .progress='text', .fun=function(x)
 colnames(lm.t) <- c('cgi', 't', 'p')
 lm.t$q <- p.adjust(lm.t$p, 'BH')
 
+# Write the results to a file.
+write.table(lm.t, 'Data/lm.tab')
+
 # Write the gene set to a file.
-source('coord_to_gene.R')
-geneset <- coordToGene(as.character(subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE)))
-writeLines(geneset, 'Data/lm-geneset.txt')
+lm.geneset <- unique(coordToGene(as.character(
+	subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE))))
+writeLines(lm.geneset, 'Data/lm-geneset.txt')
 
 # Fit a linear mixed-effects model.
 lme.t <- ddply(tall, .(cgi), .progress='text', .fun=function(x)
 	coef(summary(lmer(M ~ Group + (1|probe), x)))['GroupALL', 't value'])
 colnames(lme.t) <- c('cgi', 't')
+
+# Write the results to a file.
+write.table(lme.t, 'Data/lme.tab')
+
+# Write the gene set to a file.
+lme.geneset <- unique(coordToGene(as.character(
+	subset(lme.t, subset = abs(t) > 10, select = cgi, drop = TRUE))))
+writeLines(lme.geneset, 'Data/lme-geneset.txt')
+
+# Plot a Venn diagram of the overlap of the fixed and mixed models.
+plot.new()
+grid.draw(venn.diagram(list(
+	LinearModel = lm.geneset,
+	LinearMixedEffectsModel = lme.geneset),
+	filename=NULL, fill=c('red', 'blue')))
+
+# Plot the denisty of the q-values of the linear model.
+densityplot(lm.t$q,
+	main='Density of q-values of the linear model',
+	xlab='q-value')
+
+# Plot the denisty of the t-statistic of the linear mixed-effects model.
+densityplot(lme.t$t,
+	main='Density of the t-statistic of the linear mixed-effects model',
+	xlab='t-statistic')
 
 # Plot the M-values of a CpG island.
 stripplot(M ~ Group | probe, tall, group = Group,
