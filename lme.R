@@ -16,7 +16,8 @@ cpgi.probes.M.dat <- with(cpgi.probes.M,
 rm(cpgi.probes.M)
 
 # Take a subset of the data.
-data <- t(subset(cpgi.probes.M.dat, select = grepl('HBC|ALL', rownames(data))))
+data <- t(subset(cpgi.probes.M.dat,
+	select = grepl('HBC|ALL', colnames(cpgi.probes.M.dat))))
 cpgi <- cpgi.probes.M.dat[, 'cpgi', drop=FALSE]
 rm(cpgi.probes.M.dat)
 
