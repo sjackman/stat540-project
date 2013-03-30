@@ -41,7 +41,7 @@ lm.t$q <- p.adjust(lm.t$p, 'BH')
 write.table(lm.t, 'Data/lm.tab')
 
 # Write the gene set to a file.
-lm.geneset <- coordToGene(subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE))))
+lm.geneset <- coordToGene(subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE))
 writeLines(lm.geneset, 'Data/lm-geneset.txt')
 
 # Fit a linear mixed-effects model.
