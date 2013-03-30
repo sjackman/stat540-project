@@ -40,7 +40,7 @@ geneset <- coordToGene(as.character(subset(lm.t, subset=q<1e-5, select=cgi, drop
 writeLines(geneset, 'Data/lm-geneset.txt')
 
 # Fit a linear mixed-effects model.
-lme.t <- dlply(tall, .(cgi), .progress='text', .fun=function(x)
+lme.t <- ddply(tall, .(cgi), .progress='text', .fun=function(x)
 	coef(summary(lmer(M ~ Group + (1|probe), x)))['GroupALL', 't value'])
 colnames(lme.t) <- c('cgi', 't')
 
