@@ -3,12 +3,17 @@
 setwd('~/UBC Stats/STAT540/Group Project/')
 load('Data/CPGI2Probe_MList.Rdata')
 source('coord_to_gene.R')
+library(doParallel)
+library(foreach)
 library(latticeExtra)
 library(lme4)
 library(plyr)
 library(RColorBrewer)
 library(reshape2)
 library(VennDiagram)
+
+# Enable parallel computation.
+registerDoParallel()
 
 # Bind the datasets into one data frame.
 cpgi.probes.M.dat <- with(cpgi.probes.M,
@@ -32,8 +37,10 @@ tall <- melt(cbind(design, data), id.vars=colnames(design),
 tall$cgi <- cpgi[tall$probe,'cpgi']
 
 # Fit a linear model.
-lm.t <- ddply(tall, .(cgi), .progress='text', .fun=function(x)
-		coef(summary(lm(M ~ Group, x)))['GroupALL', c('t value', 'Pr(>|t|)')])
+system.time(
+	lm.t <- ddply(tall, .(cgi), .parallel=TRUE, .progress='text',
+		.fun=function(x)
+			coef(summary(lm(M ~ Group, x)))['GroupALL', c('t value', 'Pr(>|t|)')]))
 colnames(lm.t) <- c('cgi', 't', 'p')
 lm.t$q <- p.adjust(lm.t$p, 'BH')
 
@@ -45,8 +52,10 @@ lm.geneset <- coordToGene(subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE))
 writeLines(lm.geneset, 'Data/lm-geneset.txt')
 
 # Fit a linear mixed-effects model.
-lme.t <- ddply(tall, .(cgi), .progress='text', .fun=function(x)
-	coef(summary(lmer(M ~ Group + (1|probe), x)))['GroupALL', 't value'])
+system.time(
+	lme.t <- ddply(tall, .(cgi), .parallel=TRUE, .progress='text',
+		.fun=function(x)
+			coef(summary(lmer(M ~ Group + (1|probe), x)))['GroupALL', 't value']))
 colnames(lme.t) <- c('cgi', 't')
 
 # Write the results to a file.
