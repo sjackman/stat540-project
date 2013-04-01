@@ -61,6 +61,29 @@ colnames(lme.t) <- c('cgi', 't')
 # Write the results to a file.
 write.table(lme.t, 'Data/lme.tab')
 
+# Another linear mixed-effects model, with 'nlme' package in order to apply ML
+# and return p-values
+### I found that with very large data sets, ddply gets very slow. After a quick test, I found that it looked to get exponentially slower with the size of the data set. So I will attempt to do this by chopping up the data frame into pieces (10, for ~2500 genes each) and running the same part on each
+ids <- as.character(unique(cpgi[,1]))
+ids_list <- split(ids, ceiling(1:length(ids)/2500))
+res.list <- vector('list', length(ids_list))
+for(i in 1:length(ids_list)){
+  print(i)
+  tall.sub <- subset(tall, cgi %in% ids_list[[i]])
+  tall.sub <- droplevels(tall.sub)
+  lme.t_ml <- ddply(tall.sub, .(cgi), .progress='text', .fun = function(x){
+    res <- lme(M ~ Group, data = x, random = ~1 | probe, method = 'ML', na.action = 'na.omit')
+    summary(res)$tTable['GroupALL', c('Value', 't-value', 'p-value')]
+  })
+  res.list[[i]] <- lme.t_ml
+}
+
+
+lme.t_ml <- do.call(rbind, res.list)
+write.table(lme.t_ml, 'Data/lme_ml.tab')
+
+
+
 # Write the gene set to a file.
 lme.geneset <- coordToGene(
 	subset(lme.t, subset = abs(t) > 10, select = cgi, drop = TRUE))
