@@ -17,14 +17,17 @@ cpgi.probes.M.dat <- with(cpgi.probes.M,
 rm(cpgi.probes.M)
 
 ################################################################################
-#### ALL vs. Control
+#### APL vs. Control
 ################################################################################
-
+#Rename rows (APL = PLP + PLR)
+substr(names(cpgi.probes.M.dat)[grepl('PLP|PLR', names(cpgi.probes.M.dat))], 1, 3) <-
+  'APL'
 # Take a subset of the data.
 data <- t(subset(cpgi.probes.M.dat, 
-                 select = grepl('HBC|ALL', names(cpgi.probes.M.dat))))
+                 select = grepl('HBC|APL', names(cpgi.probes.M.dat))))
 cpgi <- cpgi.probes.M.dat[, 'cpgi', drop=FALSE]
 rm(cpgi.probes.M.dat)
+
 
 # Specify the design matrix.
 design <- data.frame(
@@ -61,22 +64,28 @@ write.table(lme.t_reml, 'Data/lme.tab')
 # Another linear mixed-effects model, with 'nlme' package in order to apply ML
 # and return p-values
 ### I found that with very large data sets, ddply gets very slow. After a quick test, I found that it looked to get exponentially slower with the size of the data set. So I will attempt to do this by chopping up the data frame into pieces (10, for ~2500 genes each) and running the same part on each
-ids <- as.character(unique(cpgi[,1]))
-ids_list <- split(ids, ceiling(1:length(ids)/2500))
-res.list <- vector('list', length(ids_list))
-for(i in 1:length(ids_list)){
-  print(i)
-  tall.sub <- subset(tall, cgi %in% ids_list[[i]])
-  tall.sub <- droplevels(tall.sub)
-  lme.t_ml <- ddply(tall.sub, .(cgi), .progress='text', .fun = function(x){
-    res <- lme(M ~ Group, data = x, random = ~1 | probe, method = 'ML', na.action = 'na.omit')
-    summary(res)$tTable['GroupALL', c('Value', 't-value', 'p-value')]
-  })
-  res.list[[i]] <- lme.t_ml
+### Use this function: it will do the above. You need to specify coefName as it would appear in the result summary, e.g. "GroupALL" or "GroupAPL"
+lme_ML_topTable <- function(tall.data, coefName){
+  ids <- as.character(unique(cpgi[,1]))
+  ids_list <- split(ids, ceiling(1:length(ids)/2500))
+  res.list <- vector('list', length(ids_list))
+  for(i in 1:length(ids_list)){
+    print(i)
+    tall.sub <- subset(tall.data, cgi %in% ids_list[[i]])
+    tall.sub <- droplevels(tall.sub)
+    lme.t_ml <- ddply(tall.sub, .(cgi), .progress='text', .fun = function(x){
+      res <- lme(M ~ Group, data = x, random = ~1 | probe, method = 'ML', na.action = 'na.omit')
+      summary(res)$tTable[coefName, c('Value', 't-value', 'p-value')]
+    })
+    res.list[[i]] <- lme.t_ml
+  }
+  return(do.call(rbind, res.list))
 }
-### And it turns out I am right... this was much faster. It took the same amount of time to run this than 10% of the whole data.
 
-write.table(lme.t_ml, 'Data/lme_ml.tab')
+# Fit the LME
+lme.t_ml_apl <- lme_ML_topTable(tall, 'GroupAPL')
+# Write to table
+write.table(lme.t_ml_apl, 'Data/lme_ml_apl.tab')
 
 
 # Write the gene set to a file.
