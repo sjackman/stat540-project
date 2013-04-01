@@ -23,15 +23,15 @@ library(simpleaffy)
 
 GSE42118 <- getGEO('GSE42118') 
 show(GSE42118) ## 8 APL and 2 healthy marrow
-save(GSE42118, file="GSE42118_matrix.R")
+save(GSE42118, file="GSE42118_matrix.Rdata")
 
 GSE39141 <- getGEO('GSE39141') 
 show(GSE39141) ## 33 samples (ALL and healthy B cells)
-save(GSE39141, file="GSE39141_matrix.R")
+save(GSE39141, file="GSE39141_matrix.Rdata")
 
 GSE42865 <- getGEO('GSE42865') 
 show(GSE42865) ## 16 healthy cells B cells
-save(GSE42865, file="GSE42865_matrix.R")
+save(GSE42865, file="GSE42865_matrix.Rdata")
 
 ### Extract expression matrices (turn into data frames at once) 
 APL.dat <- as.data.frame(exprs(GSE42118[[1]]))
