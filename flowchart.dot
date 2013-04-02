@@ -31,7 +31,7 @@ hcluster
 Perform hierarchical clustering of the samples"]
 
 lme
-[label="lme.R\n\
+[label="lme_all.R\n\
 Fit a linear mixed-effects model, and identify differentially\n\
 methylated CpG islands for ALL vs control"]
 
