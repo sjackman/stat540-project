@@ -53,6 +53,22 @@ lm.geneset <- unique(coordToGene(as.character(
 	subset(lm.t, subset=q<1e-5, select=cgi, drop=TRUE))))
 writeLines(lm.geneset, 'Data/lm-geneset.txt')
 
+lme_REML_topTable <- function(tall.data, coefName, size.each = 1500){
+  ids <- as.character(unique(cpgi[,1]))
+  ids_list <- split(ids, ceiling(1:length(ids)/size.each))
+  res.list <- vector('list', length(ids_list))
+  for(i in 1:length(ids_list)){
+    print(i)
+    tall.sub <- subset(tall.data, cgi %in% ids_list[[i]])
+    tall.sub <- droplevels(tall.sub)
+    lme.t_reml <- ddply(tall.sub, .(cgi), .progress='text', .fun=function(x)
+      coef(summary(lmer(M ~ Group + (1|probe), x)))[coefName, c('Estimate','t value')])
+    colnames(lme.t_reml) <- c('cgi', 'Estim', 't')
+    res.list[[i]] <- lme.t_reml
+  }
+  return(do.call(rbind, res.list))
+}
+
 # Fit a linear mixed-effects model.
 lme.t_reml <- ddply(tall, .(cgi), .progress='text', .fun=function(x)
   coef(summary(lmer(M ~ Group + (1|probe), x)))['GroupALL', 't value'])
