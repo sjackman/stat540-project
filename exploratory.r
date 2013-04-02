@@ -1,5 +1,4 @@
 
-
 #############################################
 ###### Exploratory Analysis
 
@@ -222,9 +221,3 @@ aaply(badProbe.df, 2, sum)
 table(listHits(lapply(badProbe.list, which)))
 #     1     2     3     4     5     6     7     8     9 
 # 21193 20702 17256 24387 14641 15344  9606  7995   310 
-
-###########################################
-##### Violin Plots for un-normalized data:
-#############################################
-
-whole.dat <- cbind()

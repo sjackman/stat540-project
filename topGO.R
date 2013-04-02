@@ -3,6 +3,7 @@
 ##### 1.) Input: Differentially Methylated Island List entitle "myInterestingIslands
 ##### 2.) Test for enriched GO groups in the list (Fisher and KS)
 ##### 3.) Convert Island name list to associated genename for input into pathway analysis
+##### 4.) Call the genes in a GO group
 #####################################################
 
 setwd("/Users/Rachel/Desktop/UBC/540/Stats540/Project/R_objects")
@@ -30,11 +31,12 @@ library(topGO)
 ### Produce topGO object
   ###list of all Islands
     islandNames<-Island$cpgiview.ucscname
-  ###Diffrentially Methylated Island List (random sample of islands now)
-  ###
-    # remove this random sampling line when have actual list (change to loading list)
-    myInterestingIslands <- sample(names(Island2GO), length(names(Island2GO)) / 1000) 
-  ###
+
+  ### Top Differentially Methylated Islands from linear mixed-effects model
+    lme_geneset_apl<-read.table(file="lme_ml.tab")
+    top_lme<-subset(lme_geneset_apl, abs(t.value)>15) # t value cutoff
+    myInterestingIslands<-as.character(top_lme$cgi)
+
     islandList <- factor(as.integer(islandNames %in% myInterestingIslands))
     names(islandList) <- islandNames
   
@@ -48,11 +50,14 @@ library(topGO)
   resultKS <- runTest(GOdata, algorithm = "classic", statistic = "ks")
   resultKS.elim <- runTest(GOdata, algorithm = "elim", statistic = "ks")
   ###Summary of top GO groups
-  allRes <- GenTable(GOdata, classicFisher = resultFisher,
+  allRes_APL <- GenTable(GOdata, classicFisher = resultFisher,
                      classicKS = resultKS, elimKS = resultKS.elim,orderBy = "elimKS", 
                      ranksOf = "classicFisher", topNodes = 10)
-          
+save(allRes_ALL, file="allRes_ALL.R") 
 
+write.table(allRes_ALL, file="allRes_ALL.txt", sep="\t") 
+write.table(allRes_APL, file="allRes_APL.txt", sep="\t") 
+load(file="allRes_ALL.R")
 ################################################################
 
 ## Genes in top Islands
@@ -72,4 +77,11 @@ int.genes<-gen.isl[gen.isl$cpgiview.ucscname %in% myInterestingIslands, 2]
 lapply(int.genes, write, "intgenes.txt", append=TRUE)
 # feed top genes into pathway analysis tool
 
+################################################################
+# Genes in top GOs
 
+prbs<-GO[["GO:0046332"]]
+gene<-subset(xx,probe_id %in%prbs)
+gogene<-unique(gene$symbol)
+
+lapply(gogene, write, "gogenes.txt", append=TRUE)
