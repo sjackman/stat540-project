@@ -40,6 +40,14 @@ lme_plp
 Fit a linear mixed-effects model, and identify differentially\n\
 methylated CpG islands for APL vs control"]
 
+lme_both
+[label="Table of differentially methylated CpG islands"]
+
+differential_methylation_figures
+[label="differential_methylation_figures.R\n\
+Produce a heat map of probes in top 10 Islands\n\
+and a Venn diagram of overlap of top islands"]
+
 topGO
 [label="topGO.R\n\
 Identify enriched Gene Ontology terms"]
@@ -53,9 +61,10 @@ normalize -> aggregate_raw_norm_filter
 exploratory_postNorm -> aggregate_raw_norm_filter
 aggregate_raw_norm_filter -> hcluster
 
-aggregate -> lme
-aggregate -> lme_plp
-lme -> topGO
-lme_plp -> topGO
+aggregate -> lme -> lme_both
+aggregate -> lme_plp -> lme_both
+
+lme_both -> differential_methylation_figures
+lme_both -> topGO
 
 }

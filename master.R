@@ -33,5 +33,9 @@ source('lme.R')
 # CpG islands for APL vs control
 source('lme_plp.R')
 
+# Produce a heat map of probes in top 10 Islands and a Venn diagram of
+# overlap of top islands
+source('differential_methylation_figures.R')
+
 # Identify enriched Gene Ontology terms
 source('topGO.R')
