@@ -1,0 +1,61 @@
+digraph flowchart {
+
+data_import
+[label="data_import.R\n\
+Import the data from GEO"]
+
+exploratory
+[label="exploratory.r\n\
+Perform exploratory analysis of the raw data"]
+
+normalize
+[label="normalize.r\n\
+Normalize the data using BMIQ"]
+
+exploratory_postNorm
+[label="exploratory_postNorm.r\n\
+Filter the data"]
+
+aggregate_raw_norm_filter
+[label="aggregate_raw_norm_filter.R\n\
+Group probes into CpG islands before and after\n\
+normalizing and filtering the data"]
+
+aggregate
+[label="aggregate.R\n\
+Group probes into CpG islands after\n\
+normalizing and filtering the data"]
+
+hcluster
+[label="hcluster.R\n\
+Perform hierarchical clustering of the samples"]
+
+lme
+[label="lme.R\n\
+Fit a linear mixed-effects model, and identify differentially\n\
+methylated CpG islands for ALL vs control"]
+
+lme_plp
+[label="lme_plp.R\n\
+Fit a linear mixed-effects model, and identify differentially\n\
+methylated CpG islands for APL vs control"]
+
+topGO
+[label="topGO.R\n\
+Identify enriched Gene Ontology terms"]
+
+data_import -> exploratory
+
+data_import -> normalize -> exploratory_postNorm -> aggregate
+
+data_import -> aggregate_raw_norm_filter
+normalize -> aggregate_raw_norm_filter
+exploratory_postNorm -> aggregate_raw_norm_filter
+aggregate_raw_norm_filter -> hcluster
+
+aggregate -> lme
+aggregate -> lme_plp
+lme -> topGO
+lme_plp -> topGO
+
+}

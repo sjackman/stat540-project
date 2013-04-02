@@ -6,7 +6,7 @@
 # Import the data from GEO
 source('data_import.R')
 
-# Perform some exploratory analysis of the raw data
+# Perform exploratory analysis of the raw data
 source('exploratory.r')
 
 # Normalize the data using BMIQ
@@ -15,10 +15,11 @@ source('normalize.r')
 # Filter the data
 source('exploratory_postNorm.r')
 
-# Group probes into CpG islands for the raw data
+# Group probes into CpG islands before and after normalizing and
+# filtering the data
 source('aggregate_raw_norm_filter.R')
 
-# Group probes into CpG islands for the normalized and filtered data
+# Group probes into CpG islands after normalizing and filtering the data
 source('aggregate.R')
 
 # Perform hierarchical clustering of the samples
