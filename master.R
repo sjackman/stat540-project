@@ -25,5 +25,9 @@ source('aggregate.R')
 source('hcluster.R')
 
 # Fit a linear mixed-effects model, and identify differentially methylated
-# CpG islands
+# CpG islands for ALL vs control
 source('lme.R')
+
+# Fit a linear mixed-effects model, and identify differentially methylated
+# CpG islands for APL vs control
+source('lme_plp.R')
