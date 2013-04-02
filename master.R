@@ -31,3 +31,6 @@ source('lme.R')
 # Fit a linear mixed-effects model, and identify differentially methylated
 # CpG islands for APL vs control
 source('lme_plp.R')
+
+# Identify enriched Gene Ontology terms
+source('topGO.R')
