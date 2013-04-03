@@ -70,7 +70,7 @@ save(result.normFilt, file = '/ubc/cs/research/irmtraud/people/jingyun/localFile
 load('Data/result_raw.Rdata')
 
 # plot clustering using ward method
-pdf("Figures/pvclusterByProbe_raw.pdf", width=30, height=20)
+pdf("Figures/pvclusterByProbe_raw.pdf", width=30, height=30)
 par(mfrow = c(2, 1))
 
 # label the leaf nodes by coloring them according to their groups
@@ -103,6 +103,14 @@ rect.hclust(result.raw$hclust, k = 5, border=c("cyan"))
 plot(result.raw,  main = "Ward Clustering for raw data with AU/Bp p-values")
 rect.hclust(result.raw$hclust, k = 5, border=c("cyan"))
 dev.off()
+
+
+# plot for p-value vs. standard error 
+pdf("Figures/pvclusterByProbe_raw_stdError.pdf")
+seplot(result.raw)
+dev.off()
+
+
 
 #*********************************************************************************
 
@@ -149,6 +157,10 @@ plot(result.norm,  main = "Ward Clustering for normalized data with AU/Bp p-valu
 rect.hclust(result.norm$hclust, k = 5, border=c("cyan"))
 dev.off()
 
+pdf("Figures/pvclusterByProbe_norm_stdError.pdf")
+seplot(result.norm)
+dev.off()
+
 #*********************************************************************************
 
 #####################################################
@@ -192,6 +204,11 @@ rect.hclust(result.normFilt$hclust, k = 5, border=c("cyan"))
 # show AU & BP values
 plot(result.normFilt,  main = "Ward Clustering for normalized and filtered with AU/Bp p-values")
 rect.hclust(result.normFilt$hclust, k = 5, border=c("cyan"))
+dev.off()
+
+
+pdf("Figures/pvclusterByProbe_normFilt_stdError.pdf")
+seplot(result.normFilt)
 dev.off()
 
 #*********************************************************************************
