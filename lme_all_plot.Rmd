@@ -1,0 +1,61 @@
+# Exploratory plots of the linear mixed-effects model
+
+```{r opts_chunk, echo=FALSE}
+library(knitr)
+opts_chunk$set(tidy=FALSE, fig.width=6, fig.height=6)
+```
+
+# Load the libraries
+```{r library, message=FALSE}
+library(lattice)
+library(VennDiagram)
+```
+
+# Load the data
+```{r load_data}
+setwd('~/UBC Stats/STAT540/Group Project/')
+
+# Load the M-values
+load('Data/ALL_tall.Rdata')
+
+# Load the results of the linear models
+lm.t <- read.table('Data/lm.tab', stringsAsFactors=FALSE)
+lme.t_reml <- read.table('Data/lme.tab', stringsAsFactors=FALSE)
+lme.t_ml <- read.table('Data/lme_ml.tab', stringsAsFactors=FALSE)
+
+# Load the sets gene hits
+lm.geneset <- readLines('Data/lm-geneset.txt')
+lme.geneset <- readLines('Data/lme-geneset.txt')
+```
+
+# Plot the M-values of a CpG island
+```{r stripplot}
+stripplot(M ~ Group | probe, tall,
+	jitter = TRUE, auto.key = TRUE, type = c('p', 'a'),
+	subset = cgi == lme.t_ml[1, 'cgi'],
+	main='Strip plot of the probes of a single CpG island',
+	ylab='M-value')
+```
+
+# Plot the denisty of the q-values of the linear model
+```{r q_lm_q_density}
+densityplot(lm.t$q,
+	main='Density of q-values of the linear model',
+	xlab='q-value')
+```
+
+# Plot the denisty of the t-statistic of the linear mixed-effects model
+```{r lmer_t_density}
+densityplot(lme.t_reml$t,
+	main='Density of the t-statistic of the linear mixed-effects model',
+	xlab='t-statistic')
+```
+
+# Venn diagram of the overlap of the hits of the fixed and mixed models
+```{r venn_lm_lmer}
+plot.new()
+grid.draw(venn.diagram(list(
+	LinearModel = lm.geneset,
+	LinearMixedEffectsModel = lme.geneset),
+	filename=NULL, fill=c('red', 'blue')))
+```

@@ -5,12 +5,9 @@ load('Data/CPGI2Probe_MList.Rdata')
 source('coord_to_gene.R')
 library(doParallel)
 library(foreach)
-library(latticeExtra)
 library(lme4)
 library(plyr)
-library(RColorBrewer)
 library(reshape2)
-library(VennDiagram)
 library(nlme)
 
 # Enable parallel computation.
@@ -40,6 +37,9 @@ design <- data.frame(
 tall <- melt(cbind(design, data), id.vars=colnames(design),
 	variable.name = 'probe', value.name = 'M')
 tall$cgi <- cpgi[tall$probe,'cpgi']
+
+# Write the reshaped data to a file.
+save(tall, file='Data/ALL_tall.Rdata')
 
 # Fit a linear model.
 system.time(
@@ -118,35 +118,3 @@ writeLines(con='Data/lme-down-geneset.txt',
 	coordToGene(subset(lme.t, subset = t < -10, select = cgi, drop = TRUE)))
 writeLines(con='Data/lme-up-geneset.txt',
 	coordToGene(subset(lme.t, subset = t > 10, select = cgi, drop = TRUE)))
-
-# Plot a Venn diagram of the overlap of the fixed and mixed models.
-plot.new()
-grid.draw(venn.diagram(list(
-	LinearModel = lm.geneset,
-	LinearMixedEffectsModel = lme.geneset),
-	filename=NULL, fill=c('red', 'blue')))
-
-# Plot the denisty of the q-values of the linear model.
-densityplot(lm.t$q,
-	main='Density of q-values of the linear model',
-	xlab='q-value')
-
-# Plot the denisty of the t-statistic of the linear mixed-effects model.
-densityplot(lme.t$t,
-	main='Density of the t-statistic of the linear mixed-effects model',
-	xlab='t-statistic')
-
-# Plot the M-values of a CpG island.
-stripplot(M ~ Group | probe, tall, group = Group,
-	auto.key = TRUE, type = c('p', 'a'),
-	subset = cgi == rownames(lme.t)[1])
-
-# A similar plot.
-mycol <- brewer.pal(7, 'Set1')[c(1,5,2,7)]
-mycol <- rgb(t(col2rgb(mycol)), alpha = 180, maxColorValue=255)
-my.par <- list(superpose.symbol = list(col = mycol, pch = 16))
-stripplot(M ~ Group | probe, tall, groups = Group,
-	par.settings = my.par,
-	auto.key = TRUE, jitter = TRUE,
-	layout = c(length(unique(tall$probe)), 1),
-	subset = cgi == rownames(lme.t)[1])
